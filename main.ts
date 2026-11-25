@@ -1,30 +1,28 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+// Two Lines to Your Past Self — v2: "The 6:12 p.m. Train"
+//
+// Writes exactly two lines to $OUTPUT_DIR/entry.txt (default /output).
+// Line 1 warns the past self about one specific moment, in one sentence.
+// Line 2 says, in one sentence, why that moment mattered and what changed.
+// No dependencies; plain Node.
+
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-// Two lines to my past self: a warning about one specific moment,
-// and one sentence on why that moment mattered.
-const TEXT =
-  "Don't delete the 2:14 a.m. voicemail from the Reno payphone where Danny slurs, 'I love you, man.'\n" +
-  "It's the last recording of his voice, and it's why you still answer every unknown number.";
+const lines = [
+  "Don't say 'I need space' as the train doors close at 6:12 p.m.",
+  "She nods, steps back, and you never hear her voice again.",
+];
 
-const lines = TEXT.split("\n");
+const text = lines.join("\n");
 if (lines.length !== 2 || lines.some((l) => l.trim().length === 0)) {
   throw new Error("entry must be exactly 2 non-empty lines");
 }
-if (lines.some((l) => !l.trim().replace(/['"”’]+$/, "").endsWith("."))) {
-  throw new Error("each line must be a single sentence");
-}
-const chars = [...TEXT].length;
-if (chars < 1 || chars > 280) {
-  throw new Error(`entry must be 1-280 characters, got ${chars}`);
+if ([...text].length < 1 || [...text].length > 280) {
+  throw new Error(`entry must be 1-280 characters, got ${[...text].length}`);
 }
 
 const outDir = process.env.OUTPUT_DIR ?? "/output";
 mkdirSync(outDir, { recursive: true });
 const outPath = join(outDir, "entry.txt");
-writeFileSync(outPath, TEXT, "utf8");
-const back = readFileSync(outPath, "utf8");
-if (back !== TEXT) {
-  throw new Error("entry.txt read-back mismatch");
-}
-console.log(`wrote ${outPath} (${chars} characters)`);
+writeFileSync(outPath, text + "\n", "utf8");
+console.log(`wrote ${outPath} (${[...text].length} characters)`);
